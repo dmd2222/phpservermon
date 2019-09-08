@@ -39,7 +39,15 @@ if (!psm_is_cli()) {
 	$data = @unserialize(PSM_CRON_ALLOW);
 	$allow = $data === false ? PSM_CRON_ALLOW : $data;
 
-	if (!in_array($_SERVER['REMOTE_ADDR'], $allow) && !in_array($_SERVER["HTTP_X_FORWARDED_FOR"], $allow)) {
+	if(in_array("localhost", $allow) == true or in_array("127.0.0.1", $allow) == true){
+		$call_ip = $_SERVER['REMOTE_ADDR'];
+		$server_ip = gethostbyname($_SERVER['HTTP_HOST']);
+		
+		if($call_ip <> $server_ip){
+			header('HTTP/1.0 403 Forbidden');
+		die('<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>IP address not allowed. See the <a href="http://docs.phpservermonitor.org/en/latest/install.html#cronjob-over-web">documentation</a> for more info.</p></body></html>');
+	}
+	}elseif (!in_array($_SERVER['REMOTE_ADDR'], $allow) && !in_array($_SERVER["HTTP_X_FORWARDED_FOR"], $allow)) {
 		header('HTTP/1.0 403 Forbidden');
 		die('<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"><html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>IP address not allowed. See the <a href="http://docs.phpservermonitor.org/en/latest/install.html#cronjob-over-web">documentation</a> for more info.</p></body></html>');
 	}
